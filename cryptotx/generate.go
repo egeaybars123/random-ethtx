@@ -24,3 +24,11 @@ func KeyToAddress(pubKey *ecdsa.PublicKey) common.Address {
 	pubBytes := elliptic.Marshal(secp256k1.S256(), pubKey.X, pubKey.Y)
 	return common.BytesToAddress(ethcrypto.Keccak256(pubBytes[1:])[12:])
 }
+
+func GenerateAddress() (*ecdsa.PrivateKey, common.Address) {
+	priv, _ := GeneratePrivKey()
+	address := KeyToAddress(&priv.PublicKey)
+
+	return priv, address
+
+}
