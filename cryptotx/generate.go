@@ -5,6 +5,7 @@ import (
 	"crypto/ecdsa"
 	"crypto/elliptic"
 	"crypto/rand"
+	"encoding/hex"
 
 	"github.com/ethereum/go-ethereum/common"
 	ethcrypto "github.com/ethereum/go-ethereum/crypto"
@@ -30,5 +31,8 @@ func GenerateAddress() (*ecdsa.PrivateKey, common.Address) {
 	address := KeyToAddress(&priv.PublicKey)
 
 	return priv, address
+}
 
+func KeyToString(privKey *ecdsa.PrivateKey) string {
+	return hex.EncodeToString(ethcrypto.FromECDSA(privKey))
 }
