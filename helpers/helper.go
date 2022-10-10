@@ -14,7 +14,7 @@ import (
 	"github.com/ethereum/go-ethereum/rpc"
 )
 
-func SendTx(privKey *ecdsa.PrivateKey, client *ethclient.Client, value *big.Int) error {
+func SendTx(privKey *ecdsa.PrivateKey, client *ethclient.Client, value *big.Int) (error, common.Address) {
 	_, toaddress := ethcrypto.GenerateAddress()
 	sender := common.HexToAddress(randomethtx.SenderAddress)
 	//fmt.Println(sender)
@@ -25,20 +25,20 @@ func SendTx(privKey *ecdsa.PrivateKey, client *ethclient.Client, value *big.Int)
 	nonce, err := client.PendingNonceAt(context.Background(), sender)
 
 	if err != nil {
-		fmt.Printf("No nonce retrieved: %v \n", err)
+		panic(err)
 	}
 	fmt.Printf("Nonce for %v: %v \n", sender, nonce)
 	chainid, err := client.ChainID(context.Background())
 
 	if err != nil {
-		return err
+		return err, sender
 	}
 
 	gasprice, _ := client.SuggestGasPrice(context.Background())
 	tx := types.NewTransaction(nonce, toaddress, value, 500000, gasprice, nil)
 	signed, _ := types.SignTx(tx, types.NewEIP155Signer(chainid), privKey)
 
-	return client.SendTransaction(context.Background(), signed)
+	return client.SendTransaction(context.Background(), signed), toaddress
 }
 
 func RPCClient() (*rpc.Client, error) {
